@@ -23,9 +23,9 @@ class UserService
         return $this->dbService->selectOne($id, $columns, $this->hidden);
     }
 
-    public function getAllUsers(array $columns = ['*'], $condition = '', array $bindings = [])
+    public function getAllUsers(array $columns = ['*'], $condition = '', array $bindings = [], $orderBy = 'id ASC', $pageSize = null, $currentPage = 1)
     {
-        return $this->dbService->select($columns, $condition, $bindings, $this->hidden);
+        return $this->dbService->select($columns, $condition, $bindings, $orderBy ,$this->hidden, $pageSize, $currentPage);
     }
 
     public function updateUser($id, array $data)

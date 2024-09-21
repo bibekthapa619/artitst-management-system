@@ -63,24 +63,59 @@ class DatabaseService
         return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
 
-    public function select(array $columns = ['*'], $condition = '', array $bindings = [], array $hidden = [])
+    public function select(array $columns = ['*'], $condition = '', array $bindings = [], $orderBy='id ASC', array $hidden = [], $pageSize = null, $currentPage = 1)
     {
-        $columns = $this->getColumnsToSelect($columns,$hidden);
-
+        $columns = $this->getColumnsToSelect($columns, $hidden);
         $columnsList = implode(',', $columns);
-        
-        $sql = "SELECT {$columnsList} FROM {$this->table}";
 
+        $from = null;
+        $to = null;
+        $lastPage = null;
+        $totalRecords = 0;
+
+        if ($pageSize !== null) {
+            $countSql = "SELECT COUNT(*) as total FROM {$this->table}";
+            if ($condition) {
+                $countSql .= " WHERE {$condition}";
+            }
+            $countStmt = $this->pdo->prepare($countSql);
+            $countStmt->execute($bindings);
+            $totalRecords = $countStmt->fetchColumn();
+
+            $offset = ($currentPage - 1) * $pageSize;
+            $from = $offset + 1;
+            $to = min($offset + $pageSize, $totalRecords);
+            $lastPage = (int)ceil($totalRecords / $pageSize);
+        }
+
+        $sql = "SELECT {$columnsList} FROM {$this->table}";
         if ($condition) {
             $sql .= " WHERE {$condition}";
+        }
+        $sql .= " ORDER BY {$orderBy}";
+
+        if ($pageSize !== null) {
+            $sql .= " LIMIT {$pageSize} OFFSET {$offset}";
         }
 
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($bindings);
+        $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
-        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        if($pageSize !== null){
+            return [
+                'data' => $results,
+                'total' => $totalRecords,
+                'page_size' => $pageSize,
+                'current_page' => $currentPage,
+                'last_page' => $lastPage,
+                'from' => $from,
+                'to' => $to,
+            ];
+        }
+
+        return $results;
     }
-
 
     public function update($id, array $data)
     {
