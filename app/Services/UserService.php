@@ -18,6 +18,11 @@ class UserService
         return $this->dbService->insert($data);
     }
 
+    public function findUser($columns = ['*'], $condition, $bindings = [], $hidden = [])
+    {
+        return $this->dbService->find($columns, $condition, $bindings, $hidden);
+    }
+
     public function getUserById($id, $columns = ['*'])
     {
         return $this->dbService->selectOne($id, $columns, $this->hidden);

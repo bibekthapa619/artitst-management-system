@@ -9,10 +9,9 @@ class DatabaseService
     protected $pdo;
     protected $table;
 
-    public function __construct($table)
+    public function __construct()
     {
         $this->pdo = DB::getPdo();
-        $this->table = $table;
     }
 
     public function setTable($table)
@@ -40,6 +39,8 @@ class DatabaseService
 
     public function insert(array $data)
     {
+        $data['created_at'] = now();
+        $data['updated_at'] = now();
         $columns = implode(',', array_keys($data));
         $placeholders = implode(',', array_fill(0, count($data), '?'));
 
@@ -59,6 +60,19 @@ class DatabaseService
         $sql = "SELECT {$columnsList} FROM {$this->table} WHERE id = ?";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$id]);
+
+        return $stmt->fetch(\PDO::FETCH_ASSOC);
+    }
+
+    public function find($columns = ['*'], $condition, $bindings = [], $hidden = [])
+    {
+        $columns = $this->getColumnsToSelect($columns,$hidden);
+
+        $columnsList = implode(',', $columns);
+
+        $sql = "SELECT {$columnsList} FROM {$this->table} WHERE {$condition}";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($bindings);
 
         return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
@@ -119,6 +133,8 @@ class DatabaseService
 
     public function update($id, array $data)
     {
+        $data['updated_at'] = now();
+        
         $columns = implode(' = ?, ', array_keys($data)) . ' = ?';
 
         $sql = "UPDATE {$this->table} SET {$columns} WHERE id = ?";
