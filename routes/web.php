@@ -18,5 +18,5 @@ Route::controller(AuthController::class)->group(function () {
 });
 
 Route::middleware('auth')->group(function(){
-    Route::get('/',[HomeController::class, 'index']);
+    Route::get('/',[HomeController::class, 'index'])->name('home');
 });
