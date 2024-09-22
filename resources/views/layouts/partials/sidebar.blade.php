@@ -4,7 +4,7 @@
             <a href="{{ route('home') }}" class="text-gray-700">Dashboard</a>
         </li>
         <li class="px-6 py-2 hover:bg-gray-200">
-            <a href="#" class="text-gray-700">Users</a>
+            <a href="{{ route('users.index') }}" class="text-gray-700">Users</a>
         </li>
         <li class="px-6 py-2 hover:bg-gray-200">
             <a href="#" class="text-gray-700">Artists</a>

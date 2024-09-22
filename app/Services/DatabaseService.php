@@ -119,12 +119,14 @@ class DatabaseService
         if($pageSize !== null){
             return [
                 'data' => $results,
-                'total' => $totalRecords,
-                'page_size' => $pageSize,
-                'current_page' => $currentPage,
-                'last_page' => $lastPage,
-                'from' => $from,
-                'to' => $to,
+                'meta' => [
+                    'total' => $totalRecords,
+                    'page_size' => $pageSize,
+                    'current_page' => $currentPage,
+                    'last_page' => $lastPage,
+                    'from' => $from,
+                    'to' => $to,
+                ],
             ];
         }
 
