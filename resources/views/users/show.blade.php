@@ -69,7 +69,28 @@
                 <label class="block text-sm font-medium text-gray-700">Address</label>
                 <p class="p-2 bg-gray-100 border border-gray-300 rounded-lg">{{ $user['address'] }}</p>
             </div>
+            
+            @if($user['role'] === 'artist')
+            <div class="md:col-span-2">
+                <h2 class="text-lg font-semibold text-gray-700 mb-2">Artist Details</h2>
+            </div>
 
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Artist Name</label>
+                <p class="p-2 bg-gray-100 border border-gray-300 rounded-lg">{{ $user['name'] }}</p>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">First Release Year</label>
+                <p class="p-2 bg-gray-100 border border-gray-300 rounded-lg">{{ $user['first_release_year'] }}</p>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">No of Albums Released</label>
+                <p class="p-2 bg-gray-100 border border-gray-300 rounded-lg">{{ $user['no_of_albums_released'] }}</p>
+            </div>
+
+            @endif
             <div class="md:col-span-2">
                 <h2 class="text-lg font-semibold text-gray-700 mb-2">Login Details</h2>
             </div>

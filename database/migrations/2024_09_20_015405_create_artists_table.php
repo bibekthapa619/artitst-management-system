@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->date('first_release_year');
+            $table->integer('first_release_year');
             $table->integer('no_of_albums_released');
             $table->timestamps();
         });

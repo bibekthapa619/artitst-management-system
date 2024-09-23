@@ -19,6 +19,11 @@ class DatabaseService
         $this->table = $table;
     }
 
+    public function getPDO()
+    {
+        return $this->pdo;
+    }
+
     protected function getColumnsToSelect($columns, $hidden)
     {
         if ($columns === ['*']) {
@@ -48,7 +53,11 @@ class DatabaseService
 
         $stmt = $this->pdo->prepare($sql);
 
-        return $stmt->execute(array_values($data));
+        $stmt->execute(array_values($data));
+
+        $id1 = $this->pdo->lastInsertId();
+
+        return $id1;
     }
 
     public function selectOne($id, $columns = ['*'],$hidden = [])
@@ -143,6 +152,18 @@ class DatabaseService
         $stmt = $this->pdo->prepare($sql);
 
         return $stmt->execute(array_merge(array_values($data), [$id]));
+    }
+
+    public function updateWithCondtion($condition, $bindings, array $data)
+    {
+        $data['updated_at'] = now();
+        
+        $columns = implode(' = ?, ', array_keys($data)) . ' = ?';
+
+        $sql = "UPDATE {$this->table} SET {$columns} WHERE {$condition}";
+        $stmt = $this->pdo->prepare($sql);
+
+        return $stmt->execute(array_merge(array_values($data), $bindings));
     }
 
     public function delete($id)

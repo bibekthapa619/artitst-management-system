@@ -81,7 +81,7 @@
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Role</label>
-                    <select name="role" class="w-full p-2 border border-gray-300 rounded-lg @error('role') border-red-500 @enderror" required>
+                    <select id="role" name="role" class="w-full p-2 border border-gray-300 rounded-lg @error('role') border-red-500 @enderror" required>
                         <option value="" disabled {{ old('role') === null ? 'selected' : '' }}>Select a role</option>
                         @foreach($roles as $role)
                             <option value="{{ $role }}" {{ old('role', $user['role'] ?? '') == $role ? 'selected' : '' }}>
@@ -100,6 +100,36 @@
                     @error('address')
                         <span class="text-red-500 text-sm">{{ $message }}</span>
                     @enderror
+                </div>
+
+                <div id="artist-fields" class="hidden md:col-span-2">
+                    <h2 class="text-lg font-semibold text-gray-700 mb-2">Artist Details</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Artist Name</label>
+                            <input type="text" name="name" value="{{ old('name') }}" class="w-full p-2 border border-gray-300 rounded-lg">
+                            @error('name')
+                                <span class="text-red-500 text-sm">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">First Release Year</label>
+                            <input type="number" name="first_release_year" value="{{ old('first_release_year') }}" class="w-full p-2 border border-gray-300 rounded-lg">
+                            @error('first_release_year')
+                                <span class="text-red-500 text-sm">{{ $message }}</span>
+                            @enderror
+                        </div>
+                
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Number of Albums Released</label>
+                            <input type="number" name="no_of_albums_released" value="{{ old('no_of_albums_released') }}" class="w-full p-2 border border-gray-300 rounded-lg">
+                            @error('no_of_albums_released')
+                                <span class="text-red-500 text-sm">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
                 </div>
 
                 <div class="md:col-span-2">
@@ -130,4 +160,22 @@
         </form>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const roleSelect = document.getElementById('role');
+        const artistFields = document.getElementById('artist-fields');
+        roleSelect.addEventListener('change', function () {
+        if (roleSelect.value === 'artist') {
+                artistFields.classList.remove('hidden');
+            } else {
+                artistFields.classList.add('hidden');
+            }
+        });
+
+        if (roleSelect.value === 'artist') {
+            artistFields.classList.remove('hidden');
+        }
+    });
+</script>
 @endsection

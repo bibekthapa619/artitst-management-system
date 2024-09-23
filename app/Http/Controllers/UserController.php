@@ -4,16 +4,23 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
+use App\Services\ArtistService;
 use App\Services\UserService;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
+
 class UserController extends Controller
 {
     protected $userService;
+    protected $artistService;
 
-    public function __construct(UserService $userService)
+    public function __construct(UserService $userService, ArtistService $artistService)
     {
         $this->userService = $userService;
+        $this->artistService = $artistService;
     }
 
     public function index(Request $request)
@@ -62,6 +69,9 @@ class UserController extends Controller
         if (!$user) {
             return redirect()->route('users.index')->with('error', 'User not found.');
         }
+        if($user['role'] === 'artist'){
+            $user = $this->artistService->getAllDetailsByUserId($id);
+        }
         return view('users.show', compact('user'));
     }
 
@@ -73,14 +83,39 @@ class UserController extends Controller
 
     public function store(StoreUserRequest $request)
     {
-        $validatedData = $request->validated();
-        
-        $validatedData['password'] = Hash::make($validatedData['password']);
-        $validatedData['super_admin_id'] = auth()->user()->id;
+        try{
+            
+            $userData = $request->validated();
+            
+            $userData['password'] = Hash::make($userData['password']);
+            $userData['super_admin_id'] = auth()->user()->id;
+            
+            DB::beginTransaction();
 
-        $this->userService->createUser($validatedData);
-
-        return redirect()->route('users.index')->with('success', 'User created successfully.');
+            $userId = $this->userService->createUser($userData);
+    
+            if($request->input('role') === 'artist')
+            {
+                $artistData = $request->validate([
+                    'name' => 'required|string|max:255',
+                    'first_release_year' => 'required|integer|min:1900|max:' . date('Y'),
+                    'no_of_albums_released' => 'required|integer|min:0',
+                ]);
+                $artistData['user_id'] = $userId;
+                $this->artistService->createArtist($artistData);
+            }
+            DB::commit();
+            return redirect()->route('users.index')->with('success', 'User created successfully.');
+        }
+        catch (ValidationException $e) {
+            DB::rollBack();
+            return redirect()->back()
+                             ->withErrors($e->validator) 
+                             ->withInput();              
+        } catch (Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->withInput()->with('error', $e->getMessage());
+        }
     }
 
     public function edit($id)
@@ -89,16 +124,45 @@ class UserController extends Controller
         if (!$user) {
             return redirect()->route('users.index')->with('error', 'User not found.');
         }
+        if($user['role'] === 'artist'){
+            $user = $this->artistService->getAllDetailsByUserId($id);
+        }
+    
         return view('users.edit', compact('user'));
     }
 
     public function update(UpdateUserRequest $request, $id)
     {
-        $validatedData = $request->validated();
+        try{
+            $validatedData = $request->validated();
 
-        $this->userService->updateUser($id, $validatedData);
+            DB::beginTransaction();
+            $this->userService->updateUser($id, $validatedData);
 
-        return redirect()->route('users.index')->with('success', 'User updated successfully.');
+            $user = $this->userService->getUserById($id);
+
+            if($user['role'] === 'artist')
+            {
+                $artistData = $request->validate([
+                    'name' => 'required|string|max:255',
+                    'first_release_year' => 'required|integer|min:1900|max:' . date('Y'),
+                    'no_of_albums_released' => 'required|integer|min:0',
+                ]);
+               
+                $this->artistService->updateArtistByUserId($user['id'],$artistData);
+            }
+            DB::commit();
+            return redirect()->route('users.index')->with('success', 'User updated successfully.');
+        }
+        catch (ValidationException $e) {
+            DB::rollBack();
+            return redirect()->back()
+                             ->withErrors($e->validator) 
+                             ->withInput();              
+        } catch (Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->withInput()->with('error', $e->getMessage());
+        }
     }
 
     public function destroy($id)

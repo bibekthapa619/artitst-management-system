@@ -28,7 +28,7 @@ class StoreUserRequest extends FormRequest
             'phone' => 'required|string|max:20|unique:users',
             'dob' => 'required|date',
             'gender' => 'required|in:m,f,o',
-            'role' => 'required|string',
+            'role' => 'required|string|in:artist,artist_manager',
             'address' => 'required|string|max:255',
             'password' => 'required|string|min:8',
         ];

@@ -87,7 +87,38 @@
                         <span class="text-red-500 text-sm">{{ $message }}</span>
                     @enderror
                 </div>
-
+                @if($user['role'] === 'artist')
+                <div id="artist-fields" class="md:col-span-2">
+                    <h2 class="text-lg font-semibold text-gray-700 mb-2">Artist Details</h2>
+                
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Artist Name</label>
+                            <input type="text" name="name" value="{{ old('name', $user['name'] ?? '') }}" class="w-full p-2 border border-gray-300 rounded-lg" required>
+                            @error('name')
+                                <span class="text-red-500 text-sm">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">First Release Year</label>
+                            <input type="number" name="first_release_year" value="{{ old('first_release_year', $user['first_release_year'] ?? '') }}" class="w-full p-2 border border-gray-300 rounded-lg" required>
+                            @error('first_release_year')
+                                <span class="text-red-500 text-sm">{{ $message }}</span>
+                            @enderror
+                        </div>
+                
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Number of Albums Released</label>
+                            <input type="number" name="no_of_albums_released" value="{{ old('no_of_albums_released', $user['no_of_albums_released'] ?? '') }}" class="w-full p-2 border border-gray-300 rounded-lg" required>
+                            @error('no_of_albums_released')
+                                <span class="text-red-500 text-sm">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+                @endif
+                
                 <div class="md:col-span-2">
                     <h2 class="text-lg font-semibold text-gray-700 mb-2">Login Details</h2>
                 </div>
