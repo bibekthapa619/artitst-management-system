@@ -23,6 +23,7 @@
                 <table class="min-w-full bg-white border border-gray-200 rounded-lg">
                     <thead>
                         <tr class="bg-indigo-100 text-indigo-600 uppercase text-sm leading-normal">
+                            <th class="py-3 px-6 text-left">SN</th>
                             <th class="py-3 px-6 text-left">Name</th>
                             <th class="py-3 px-6 text-left">Email</th>
                             <th class="py-3 px-6 text-left">Phone</th>
@@ -34,6 +35,9 @@
                     <tbody id="usersTable" class="text-gray-600 text-sm">
                         @foreach($users as $user)
                             <tr class="border-b border-gray-200 hover:bg-gray-50">
+                                <td class="py-3 px-6 text-left">
+                                    {{ ($pagination['current_page'] - 1) * $pagination['page_size'] + $loop->index + 1 }}
+                                </td>
                                 <td class="py-3 px-6 text-left">{{ $user['first_name'] }} {{ $user['last_name'] }}</td>
                                 <td class="py-3 px-6 text-left">{{ $user['email'] }}</td>
                                 <td class="py-3 px-6 text-left">{{ $user['phone'] }}</td>
