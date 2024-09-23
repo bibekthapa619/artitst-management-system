@@ -11,8 +11,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
-
-class UserController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+class UserController extends Controller implements HasMiddleware
 {
     protected $userService;
     protected $artistService;
@@ -21,6 +22,12 @@ class UserController extends Controller
     {
         $this->userService = $userService;
         $this->artistService = $artistService;
+    }
+
+    public static function middleware():array{
+        return [
+            new Middleware('role:super_admin')
+        ];
     }
 
     public function index(Request $request)

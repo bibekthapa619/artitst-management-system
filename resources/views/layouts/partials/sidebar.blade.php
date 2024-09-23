@@ -6,11 +6,20 @@
         <li class="px-6 py-2 hover:bg-gray-200 {{ request()->is('/') ? 'bg-indigo-200 text-indigo-600' : 'text-gray-700' }}">
             <a href="{{ route('home') }}">Dashboard</a>
         </li>
+        @hasrole('super_admin')
         <li class="px-6 py-2 hover:bg-gray-200 {{ request()->is('users*') ? 'bg-indigo-200 text-indigo-600' : 'text-gray-700' }}">
             <a href="{{ route('users.index') }}">Users</a>
         </li>
+        @endhasrole
+        @hasrole('super_admin|artist_manager')
         <li class="px-6 py-2 hover:bg-gray-200 {{ request()->is('artists*') ? 'bg-indigo-200 text-indigo-600' : 'text-gray-700' }}">
             <a href="#">Artists</a>
         </li>
+        @endhasrole
+        @hasrole('artist')
+        <li class="px-6 py-2 hover:bg-gray-200 {{ request()->is('artists*') ? 'bg-indigo-200 text-indigo-600' : 'text-gray-700' }}">
+            <a href="#">My Music</a>
+        </li>
+        @endhasrole
     </ul>
 </div>
