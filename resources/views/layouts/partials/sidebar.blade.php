@@ -3,14 +3,14 @@
         <a href="/" class="text-xl font-semibold text-indigo-600">Artist Management</a>
     </div>
     <ul class="mt-4">
-        <li class="px-6 py-2 hover:bg-gray-200">
-            <a href="{{ route('home') }}" class="text-gray-700">Dashboard</a>
+        <li class="px-6 py-2 hover:bg-gray-200 {{ request()->is('/') ? 'bg-indigo-200 text-indigo-600' : 'text-gray-700' }}">
+            <a href="{{ route('home') }}">Dashboard</a>
         </li>
-        <li class="px-6 py-2 hover:bg-gray-200">
-            <a href="{{ route('users.index') }}" class="text-gray-700">Users</a>
+        <li class="px-6 py-2 hover:bg-gray-200 {{ request()->is('users*') ? 'bg-indigo-200 text-indigo-600' : 'text-gray-700' }}">
+            <a href="{{ route('users.index') }}">Users</a>
         </li>
-        <li class="px-6 py-2 hover:bg-gray-200">
-            <a href="#" class="text-gray-700">Artists</a>
+        <li class="px-6 py-2 hover:bg-gray-200 {{ request()->is('artists*') ? 'bg-indigo-200 text-indigo-600' : 'text-gray-700' }}">
+            <a href="#">Artists</a>
         </li>
     </ul>
 </div>
