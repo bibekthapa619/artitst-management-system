@@ -3,7 +3,7 @@
 @section('title', 'Users')
 
 @section('content')
-<div class="container mx-auto py-8">
+<div class="container mx-auto">
     <div class="bg-white shadow overflow-hidden sm:rounded-lg p-6">
         <nav class="flex mb-4" aria-label="Breadcrumb">
             <ol class="inline-flex items-center space-x-1 md:space-x-3">

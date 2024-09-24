@@ -3,7 +3,7 @@
 @section('title', 'Artists')
 
 @section('content')
-<div class="container mx-auto py-8">
+<div class="container mx-auto">
     <div class="bg-white shadow overflow-hidden sm:rounded-lg p-6">
         <h1 class="text-2xl font-bold text-indigo-600">Artists</h1>
 
