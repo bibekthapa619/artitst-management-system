@@ -51,7 +51,6 @@ class ArtistImport implements ToCollection
                 'no_of_albums_released' => $row[9] ?? null,
             ];
 
-            // Validate the row data
             $validator = Validator::make($rowData, [
                 'first_name' => 'required|string|max:255',
                 'last_name' => 'required|string|max:255',

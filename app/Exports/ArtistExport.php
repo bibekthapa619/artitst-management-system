@@ -37,7 +37,6 @@ class ArtistExport implements FromCollection, WithHeadings, WithMapping
      */
     public function collection()
     {
-        // Prepare the condition and bindings
         $condition = "users.super_admin_id ='$this->superAdminId'";
         $bindings = [];
 
@@ -55,7 +54,6 @@ class ArtistExport implements FromCollection, WithHeadings, WithMapping
             ];
         }
 
-        // Use the ArtistService to fetch the required data
         $data = $this->artistService->getAllArtists(
             columns: [
                 'users.first_name',
@@ -76,7 +74,7 @@ class ArtistExport implements FromCollection, WithHeadings, WithMapping
             currentPage: null
         );
 
-        return collect($data); // Return as a collection for export
+        return collect($data); 
     }
 
     /**
@@ -87,16 +85,16 @@ class ArtistExport implements FromCollection, WithHeadings, WithMapping
     public function headings(): array
     {
         return [
-            'First Name',
-            'Last Name',
-            'Date of Birth',
-            'Gender',
-            'Phone',
-            'Address',
-            'Email',
-            'Artist Name',
-            'First Release Year',
-            'Number of Albums Released'
+            'first_name',
+            'last_name',
+            'email',
+            'phone',
+            'dob',
+            'gender',
+            'address',
+            'artist_name',
+            'first_release_year',
+            'no_of_albums_released'
         ];
     }
 
@@ -111,11 +109,11 @@ class ArtistExport implements FromCollection, WithHeadings, WithMapping
         return [
             $row['first_name'],
             $row['last_name'],
+            $row['email'],
+            $row['phone'],
             $row['dob'],
             $row['gender'],
-            $row['phone'],
             $row['address'],
-            $row['email'],
             $row['artist_name'],
             $row['first_release_year'],
             $row['no_of_albums_released'],
