@@ -86,7 +86,7 @@ class DatabaseService
         return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
 
-    public function select(array $columns = ['*'], $condition = '', array $bindings = [], $orderBy='id ASC', array $hidden = [], $pageSize = null, $currentPage = 1)
+    public function select(array $columns = ['*'], $condition = '', array $bindings = [], $orderBy='id ASC', array $hidden = [], $pageSize = null, $currentPage = 1, $join = '')
     {
         $columns = $this->getColumnsToSelect($columns, $hidden);
         $columnsList = implode(',', $columns);
@@ -98,6 +98,10 @@ class DatabaseService
 
         if ($pageSize !== null) {
             $countSql = "SELECT COUNT(*) as total FROM {$this->table}";
+            if($join){
+                $countSql .= " JOIN {$join}";
+            }
+
             if ($condition) {
                 $countSql .= " WHERE {$condition}";
             }
@@ -112,6 +116,9 @@ class DatabaseService
         }
 
         $sql = "SELECT {$columnsList} FROM {$this->table}";
+        if($join){
+            $sql .= " JOIN {$join}";
+        }
         if ($condition) {
             $sql .= " WHERE {$condition}";
         }
@@ -120,7 +127,7 @@ class DatabaseService
         if ($pageSize !== null) {
             $sql .= " LIMIT {$pageSize} OFFSET {$offset}";
         }
-
+        
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($bindings);
         $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
