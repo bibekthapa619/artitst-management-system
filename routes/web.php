@@ -43,6 +43,7 @@ Route::middleware('auth')->group(function(){
         Route::get('/{userId}/music', 'showMusic')->name('artists.show-music');
         Route::get('/import','importForm')->name('artists.import-form');
         Route::post('/import','import')->name('artists.import');
+        Route::get('/export','export')->name('artists.export');
         Route::get('/{userId}', 'show')->name('artists.show');
     });
 

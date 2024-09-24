@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ArtistExport;
 use App\Http\Requests\StoreArtistRequest;
 use App\Http\Requests\UpdateArtistRequest;
 use Maatwebsite\Excel\Facades\Excel;
@@ -35,7 +36,7 @@ class ArtistController extends Controller implements HasMiddleware
     public static function middleware():array{
         return [
             new Middleware(middleware:'role:super_admin|artist_manager',only:['index','show','showMusic']),
-            new Middleware(middleware:'role:artist_manager',only:['create','store','edit','update']),
+            new Middleware(middleware:'role:artist_manager',only:['create','store','edit','update','import','export']),
         ];
     }
 
@@ -248,9 +249,7 @@ class ArtistController extends Controller implements HasMiddleware
             'csv_file' => 'required|mimes:csv,txt|max:2048',
         ]);
 
-        // Try to import and validate the CSV data
         try {
-            // Initialize the ArtistImport class and load the data from the CSV file
             $import = new ArtistImport();
             DB::beginTransaction();
             Excel::import($import, $request->file('csv_file'));
@@ -293,5 +292,15 @@ class ArtistController extends Controller implements HasMiddleware
             DB::rollBack();
             return redirect()->route('artists.import-form')->with('error', $e->getMessage());
         }
+    }
+
+    public function export(Request $request)
+    {
+        $user = Auth::user();
+        $superAdminId = $user->super_admin_id;
+
+        $search = $request->search;
+        
+        return Excel::download(new ArtistExport($this->artistService, $superAdminId, $search), 'artists.csv');
     }
 }
