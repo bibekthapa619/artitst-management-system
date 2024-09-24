@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ArtistController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
@@ -29,6 +30,16 @@ Route::middleware('auth')->group(function(){
         Route::put('/{id}', 'update')->name('users.update');  
         Route::delete('/{id}', 'destroy')->name('users.destroy');
         Route::get('/{id}', 'show')->name('users.show');
+    });
+
+    Route::prefix('artists')->controller(ArtistController::class)->group(function () {
+        Route::get('/', 'index')->name('artists.index');
+        Route::get('/create', 'create')->name('artists.create');  
+        Route::post('/', 'store')->name('artists.store');
+        Route::get('/{userId}/edit', 'edit')->name('artists.edit');
+        Route::put('/{userId}', 'update')->name('artists.update');  
+        Route::delete('/{userId}', 'destroy')->name('artists.destroy');
+        Route::get('/{userId}', 'show')->name('artists.show');
     });
     
 });

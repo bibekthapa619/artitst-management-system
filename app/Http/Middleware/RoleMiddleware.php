@@ -16,12 +16,13 @@ class RoleMiddleware
      * @param  string[]  ...$roles
      * @return mixed
      */
-    public function handle(Request $request, Closure $next, ...$roles)
+    public function handle(Request $request, Closure $next, $roles)
     {
         $user = Auth::user();
+        $rolesArray = explode('|', $roles);
 
-        if (!$user || !in_array($user->role, $roles)) {
-            abort(403);
+        if (!$user || !in_array($user->role, $rolesArray)) {
+            abort(403, 'Forbidden');
         }
 
         return $next($request);

@@ -26,9 +26,6 @@
         <h1 class="text-2xl font-bold text-indigo-600">User Details</h1>
 
         <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="md:col-span-2">
-                <h2 class="text-lg font-semibold text-gray-700 mb-2">User Details</h2>
-            </div>
 
             <div>
                 <label class="block text-sm font-medium text-gray-700">First Name</label>

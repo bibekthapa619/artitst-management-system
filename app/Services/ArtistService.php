@@ -49,4 +49,10 @@ class ArtistService
         return $this->dbService->updateWithCondtion('user_id = ?', [$userId] ,$data);
     }
 
+    public function getAllArtists(array $columns = ['*'], $condition = '', array $bindings = [], $orderBy = 'id ASC', $pageSize = null, $currentPage = 1)
+    {
+        $join = "users ON users.id = artists.user_id";
+        return $this->dbService->select($columns, $condition, $bindings, $orderBy ,$this->hidden, $pageSize, $currentPage, $join);
+    }
+
 }
