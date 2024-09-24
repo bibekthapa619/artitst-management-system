@@ -40,6 +40,7 @@ Route::middleware('auth')->group(function(){
         Route::get('/{userId}/edit', 'edit')->name('artists.edit');
         Route::put('/{userId}', 'update')->name('artists.update');  
         Route::delete('/{userId}', 'destroy')->name('artists.destroy');
+        Route::get('/{userId}/music', 'showMusic')->name('artists.show-music');
         Route::get('/{userId}', 'show')->name('artists.show');
     });
 

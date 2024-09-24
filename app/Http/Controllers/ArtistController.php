@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreArtistRequest;
 use App\Http\Requests\UpdateArtistRequest;
 use App\Services\ArtistService;
+use App\Services\MusicService;
 use App\Services\UserService;
 use Exception;
 use Illuminate\Http\Request;
@@ -18,16 +19,19 @@ class ArtistController extends Controller implements HasMiddleware
 {
     protected $userService;
     protected $artistService;
+    protected $musicService;
+    protected $genres = ['rnb','country','classic','rock','jazz'];
 
-    public function __construct(UserService $userService, ArtistService $artistService)
+    public function __construct(UserService $userService, ArtistService $artistService, MusicService $musicService)
     {
         $this->userService = $userService;
         $this->artistService = $artistService;
+        $this->musicService = $musicService;
     }
 
     public static function middleware():array{
         return [
-            new Middleware(middleware:'role:super_admin|artist_manager',only:['index','show']),
+            new Middleware(middleware:'role:super_admin|artist_manager',only:['index','show','showMusic']),
             new Middleware(middleware:'role:artist_manager',only:['create','store','edit','update']),
         ];
     }
@@ -84,6 +88,49 @@ class ArtistController extends Controller implements HasMiddleware
             return redirect()->route('artists.index')->with('error', 'Artist not found.');
         }
         return view('artists.show', compact('artist'));
+    }
+
+    public function showMusic(Request $request, $userId)
+    {
+        $page = $request->page ?? 1;
+        $pageSize = $request->page_size ?? 10;
+        $search = $request->search;
+        $artist = $this->artistService->getArtistByUserId($userId);
+
+        if (!$artist) {
+            return redirect()->route('artists.index')->with('error', 'Artist not found.');
+        }
+
+        $condition = "artist_id = {$artist['id']}";
+        $bindings = [];
+
+        if($search){
+            if(in_array($search,$this->genres)){
+                $condition .= " AND genre = ?";
+                $bindings = [$search];
+            }
+            else{
+                $condition .= " AND (title like  ?
+                                OR album_name like ?
+                            )";
+                $bindings = [
+                    "%$search%",
+                    "%$search%",
+                ];
+            }            
+        }
+     
+        $data = $this->musicService->getAllMusic(
+                                        columns:['*'], 
+                                        condition:$condition, 
+                                        bindings:$bindings, 
+                                        orderBy:'id ASC', 
+                                        pageSize:$pageSize, 
+                                        currentPage:$page);
+        $musics = $data['data'];
+        $pagination = $data['meta'];
+
+        return view('artists.show-music', compact('artist', 'musics','pagination'));
     }
 
     public function create()
