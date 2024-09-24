@@ -84,7 +84,7 @@
                     <select id="role" name="role" class="w-full p-2 border border-gray-300 rounded-lg @error('role') border-red-500 @enderror" required>
                         <option value="" disabled {{ old('role') === null ? 'selected' : '' }}>Select a role</option>
                         @foreach($roles as $role)
-                            <option value="{{ $role }}" {{ old('role', $user['role'] ?? '') == $role ? 'selected' : '' }}>
+                            <option value="{{ $role }}" {{ old('role') == $role ? 'selected' : '' }}>
                                 {{ $role }}
                             </option>
                         @endforeach

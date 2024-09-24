@@ -4,6 +4,7 @@ use App\Http\Controllers\ArtistController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\MusicController;
 use App\Http\Controllers\UserController;
 
 Route::controller(AuthController::class)->group(function () {
@@ -40,6 +41,15 @@ Route::middleware('auth')->group(function(){
         Route::put('/{userId}', 'update')->name('artists.update');  
         Route::delete('/{userId}', 'destroy')->name('artists.destroy');
         Route::get('/{userId}', 'show')->name('artists.show');
+    });
+
+    Route::prefix('music')->controller(MusicController::class)->group(function(){
+        Route::get('/','index')->name('music.index');
+        Route::get('/create','create')->name('music.create');
+        Route::post('/','store')->name('music.store');
+        Route::get('/{id}/edit','edit')->name('music.edit');
+        Route::put('/{id}','update')->name('music.update');
+        Route::delete('/{id}','destroy')->name('music.destroy');
     });
     
 });
