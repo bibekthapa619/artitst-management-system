@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreArtistRequest;
 use App\Http\Requests\UpdateArtistRequest;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\ArtistImport;
+use Illuminate\Validation\ValidationException;
 use App\Services\ArtistService;
 use App\Services\MusicService;
 use App\Services\UserService;
@@ -169,7 +172,7 @@ class ArtistController extends Controller implements HasMiddleware
             $this->artistService->createArtist($artistData);
 
             DB::commit();
-            return redirect()->route('artists.index')->with('success', 'Artist updated successfully.');
+            return redirect()->route('artists.index')->with('success', 'Artist created successfully.');
         }
         catch (Exception $e) {
             DB::rollBack();
@@ -232,5 +235,63 @@ class ArtistController extends Controller implements HasMiddleware
         $this->userService->deleteUser($id);
 
         return redirect()->route('artists.index')->with('success', 'Artist deleted successfully.');
+    }
+
+    public function importForm()
+    {
+        return view('artists.import');
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'csv_file' => 'required|mimes:csv,txt|max:2048',
+        ]);
+
+        // Try to import and validate the CSV data
+        try {
+            // Initialize the ArtistImport class and load the data from the CSV file
+            $import = new ArtistImport();
+            DB::beginTransaction();
+            Excel::import($import, $request->file('csv_file'));
+
+            $validatedData = $import->getValidatedData();
+
+            foreach($validatedData as $data){
+                $userData = [
+                    'first_name' => $data['first_name'],
+                    'last_name'  => $data['last_name'],
+                    'email'      => $data['email'],
+                    'phone'      => $data['phone'],
+                    'password'   => bcrypt('password'),
+                    'dob'        => $data['dob'],
+                    'gender'     => $data['gender'],
+                    'address'    => $data['address'],
+                    'role'       => 'artist',
+                    'super_admin_id' => Auth::user()->super_admin_id,
+                ];
+                $userId = $this->userService->createUser($userData);
+                
+                $artistData = [
+                    'user_id'               => $userId,
+                    'name'           => $data['artist_name'],
+                    'first_release_year'    => $data['first_release_year'],
+                    'no_of_albums_released' => $data['no_of_albums_released']
+                ];
+
+                $this->artistService->createArtist($artistData);
+
+            }
+            DB::commit();
+            return redirect()->route('artists.import-form')->with('success','File imported successfully');
+        } catch (ValidationException $e) {
+            DB::rollBack();
+            return back()->withErrors($import->getValidationErrors());
+        }
+        catch(Exception $e)
+        {
+            DB::rollBack();
+            return redirect()->route('artists.import-form')->with('error', $e->getMessage());
+        }
     }
 }

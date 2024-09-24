@@ -3,7 +3,7 @@
 @section('title', 'Artists')
 
 @section('content')
-<div class="container mx-auto">
+<div class="container mx-auto py-8">
     <div class="bg-white shadow overflow-hidden sm:rounded-lg p-6">
         <h1 class="text-2xl font-bold text-indigo-600">Artists</h1>
 
@@ -12,12 +12,32 @@
                 <input type="text" name="search" class="w-full p-2 border border-gray-300 rounded-lg" placeholder="Search artists..." value="{{ request()->get('search') }}">
                 <button type="submit" class="ml-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Search</button>
             </form>
+            
             @hasrole('artist_manager')
-            <a href="{{ route('artists.create') }}" class="ml-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
-                Create
-            </a>
+            <div class="relative">
+                <button id="options-menu-button" class="ml-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 flex items-center">
+                    Options
+                    <svg class="w-5 h-5 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+        
+                <div id="options-menu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5">
+                    <div class="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu-button">
+                        <a href="{{ route('artists.create') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" role="menuitem">
+                            Create Artist
+                        </a>
+                        <a href="{{ route('artists.import-form') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" role="menuitem">
+                            Import
+                        </a>
+                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" role="menuitem">
+                            Export
+                        </a>
+                    </div>
+                </div>
+            </div>
             @endhasrole
-        </div>
+        </div>      
 
         <div class="bg-white shadow-sm rounded-lg overflow-hidden">
             <div class="overflow-x-auto">
@@ -80,6 +100,25 @@
     </div>
 </div>
 <script>
+    const optionsButton = document.getElementById('options-menu-button');
+    const optionsMenu = document.getElementById('options-menu');
+
+    optionsButton.addEventListener('click', function () {
+        optionsMenu.classList.toggle('hidden');
+    });
+
+    optionsMenu.addEventListener('click', function () {
+        optionsMenu.classList.toggle('hidden');
+    });
+
+    document.addEventListener('click', function (event) {
+        const isClickInside = optionsButton.contains(event.target) || optionsMenu.contains(event.target);
+
+        if (!isClickInside) {
+            optionsMenu.classList.add('hidden');
+        }
+    });
+
     function confirmDelete() {
         return confirm('Are you sure you want to delete this artist?');
     }

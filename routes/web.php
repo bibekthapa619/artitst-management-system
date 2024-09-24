@@ -41,6 +41,8 @@ Route::middleware('auth')->group(function(){
         Route::put('/{userId}', 'update')->name('artists.update');  
         Route::delete('/{userId}', 'destroy')->name('artists.destroy');
         Route::get('/{userId}/music', 'showMusic')->name('artists.show-music');
+        Route::get('/import','importForm')->name('artists.import-form');
+        Route::post('/import','import')->name('artists.import');
         Route::get('/{userId}', 'show')->name('artists.show');
     });
 
