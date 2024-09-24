@@ -12,14 +12,32 @@ class ArtistImport implements ToCollection
 {
     public $validatedData = [];
     public $validationErrors = [];
+    protected $expectedHeaders = [
+        'first_name',
+        'last_name',
+        'email',
+        'phone',
+        'dob',
+        'gender',
+        'address',
+        'artist_name',
+        'first_release_year',
+        'no_of_albums_released',
+    ];
 
     public function collection(Collection $rows)
     {
+        $headerRow = $rows[0]; 
+        $this->validateHeaders($headerRow);
+        if (!empty($this->validationErrors)) {
+            $messageBag = new MessageBag(['validationErrors' => $this->validationErrors]);
+
+            throw ValidationException::withMessages($messageBag->getMessages());
+        }
+
         foreach ($rows as $key => $row) {
-            // Skip header row (usually the first row)
             if ($key == 0) continue;
 
-            // Prepare row data with correct field names
             $rowData = [
                 'first_name' => $row[0] ?? null,
                 'last_name' => $row[1] ?? null,
@@ -72,5 +90,18 @@ class ArtistImport implements ToCollection
     public function getValidationErrors()
     {
         return $this->validationErrors;
+    }
+
+    protected function validateHeaders($headerRow)
+    {
+        if (count($headerRow) !== count($this->expectedHeaders)) {
+            $this->validationErrors[] = "Invalid number of columns in the header row.";
+        }
+
+        foreach ($headerRow as $index => $header) {
+            if (trim(strtolower($header)) !== $this->expectedHeaders[$index]) {
+                $this->validationErrors[] = "Invalid header at position " . ($index + 1) . ". Expected '" . $this->expectedHeaders[$index] . "', got '" . $header . "'.";
+            }
+        }
     }
 }
