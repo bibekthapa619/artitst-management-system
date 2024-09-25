@@ -1,9 +1,7 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
-
+use Illuminate\Support\Facades\DB;
 return new class extends Migration
 {
     /**
@@ -11,21 +9,26 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('artists', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->integer('first_release_year');
-            $table->integer('no_of_albums_released');
-            $table->timestamps();
-        });
+        DB::statement("
+            CREATE TABLE artists (
+                id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                name VARCHAR(255) NOT NULL,
+                user_id BIGINT UNSIGNED NOT NULL,
+                first_release_year INT NOT NULL,
+                no_of_albums_released INT NOT NULL,
+                created_at TIMESTAMP NULL DEFAULT NULL,
+                updated_at TIMESTAMP NULL DEFAULT NULL,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+            );
+        ");
     }
+
 
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('artists');
+        DB::statement("DROP TABLE IF EXISTS artists;");
     }
 };

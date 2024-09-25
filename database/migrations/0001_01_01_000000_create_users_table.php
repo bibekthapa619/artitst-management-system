@@ -1,9 +1,7 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
-
+use Illuminate\Support\Facades\DB;
 return new class extends Migration
 {
     /**
@@ -11,36 +9,38 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('super_admin_id')->nullable()->constrained('users')->onDelete('cascade');
-            $table->string('first_name');
-            $table->string('last_name');
-            $table->string('email')->unique();
-            $table->string('password');
-            $table->string('phone')->unique();
-            $table->date('dob');
-            $table->enum('gender',['m','f','o']);
-            $table->enum('role',['super_admin','artist_manager','artist']);
-            $table->string('address');
-            $table->rememberToken();
-            $table->timestamps();
-        });
+        DB::statement("
+            CREATE TABLE users (
+                id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                super_admin_id BIGINT UNSIGNED NULL,
+                first_name VARCHAR(255) NOT NULL,
+                last_name VARCHAR(255) NOT NULL,
+                email VARCHAR(255) UNIQUE NOT NULL,
+                password VARCHAR(255) NOT NULL,
+                phone VARCHAR(255) UNIQUE NOT NULL,
+                dob DATE NOT NULL,
+                gender ENUM('m', 'f', 'o') NOT NULL,
+                role ENUM('super_admin', 'artist_manager', 'artist') NOT NULL,
+                address VARCHAR(255) NOT NULL,
+                remember_token VARCHAR(100) NULL,
+                created_at TIMESTAMP NULL DEFAULT NULL,
+                updated_at TIMESTAMP NULL DEFAULT NULL,
+                FOREIGN KEY (super_admin_id) REFERENCES users(id) ON DELETE CASCADE
+            );
+        ");
 
-        Schema::create('password_reset_tokens', function (Blueprint $table) {
-            $table->string('email')->primary();
-            $table->string('token');
-            $table->timestamp('created_at')->nullable();
-        });
-
-        Schema::create('sessions', function (Blueprint $table) {
-            $table->string('id')->primary();
-            $table->foreignId('user_id')->nullable()->index();
-            $table->string('ip_address', 45)->nullable();
-            $table->text('user_agent')->nullable();
-            $table->longText('payload');
-            $table->integer('last_activity')->index();
-        });
+        DB::statement("
+            CREATE TABLE sessions (
+                id VARCHAR(255) PRIMARY KEY,
+                user_id BIGINT UNSIGNED NULL,
+                ip_address VARCHAR(45) NULL,
+                user_agent TEXT NULL,
+                payload LONGTEXT NOT NULL,
+                last_activity INT NOT NULL,
+                INDEX (user_id),
+                INDEX (last_activity)
+            );
+        ");
     }
 
     /**
@@ -48,8 +48,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
-        Schema::dropIfExists('password_reset_tokens');
-        Schema::dropIfExists('sessions');
+        DB::statement("DROP TABLE IF EXISTS users;");
+        DB::statement("DROP TABLE IF EXISTS sessions;");
     }
 };

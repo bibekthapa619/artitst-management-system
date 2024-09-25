@@ -1,9 +1,7 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
-
+use Illuminate\Support\Facades\DB;
 return new class extends Migration
 {
     /**
@@ -11,14 +9,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('musics', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('artist_id')->constrained('artists')->onDelete('cascade');
-            $table->string('title');
-            $table->string('album_name');
-            $table->enum('genre',['rnb','country','classic','rock','jazz']);
-            $table->timestamps();
-        });
+        DB::statement("
+            CREATE TABLE musics (
+                id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                artist_id BIGINT UNSIGNED NOT NULL,
+                title VARCHAR(255) NOT NULL,
+                album_name VARCHAR(255) NOT NULL,
+                genre ENUM('rnb', 'country', 'classic', 'rock', 'jazz') NOT NULL,
+                created_at TIMESTAMP NULL DEFAULT NULL,
+                updated_at TIMESTAMP NULL DEFAULT NULL,
+                FOREIGN KEY (artist_id) REFERENCES artists(id) ON DELETE CASCADE
+            );
+        ");
     }
 
     /**
@@ -26,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('songs');
+        DB::statement("DROP TABLE IF EXISTS musics;");
     }
 };
