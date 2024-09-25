@@ -22,7 +22,7 @@
                     </svg>
                 </button>
         
-                <div id="options-menu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5">
+                <div id="options-menu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50">
                     <div class="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu-button">
                         <a href="{{ route('artists.create') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" role="menuitem">
                             Create Artist
@@ -39,8 +39,8 @@
             @endhasrole
         </div>      
 
-        <div class="bg-white shadow-sm rounded-lg overflow-hidden">
-            <div class="overflow-x-auto">
+        <div class="bg-white shadow-sm rounded-lg">
+            <div class="table-responsive">
                 <table class="min-w-full bg-white border border-gray-200 rounded-lg">
                     <thead>
                         <tr class="bg-indigo-100 text-indigo-600 uppercase text-sm leading-normal">
@@ -71,7 +71,7 @@
                                                   </svg>
                                             </button>
                                 
-                                            <div class="hidden origin-top-right absolute right-0 mt-2 w-44 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
+                                            <div class="hidden origin-top-right absolute right-0 mt-2 w-44 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
                                                 <div class="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
                                                     <a href="{{ route('artists.show', $artist['user_id']) }}" class="block px-4 py-2 text-sm text-gray-600 hover:bg-blue-50" role="menuitem">Profile</a>
                                                     <a href="{{ route('artists.show-music', $artist['user_id']) }}" class="block px-4 py-2 text-sm text-gray-600 hover:bg-blue-50" role="menuitem">Music</a>
@@ -99,6 +99,7 @@
         @include('partials.pagination')
     </div>
 </div>
+
 <script>
     const optionsButton = document.getElementById('options-menu-button');
     const optionsMenu = document.getElementById('options-menu');
@@ -125,9 +126,27 @@
 
     function toggleDropdown(button) {
         const dropdown = button.nextElementSibling;
-        dropdown.classList.toggle('hidden');
-    }
 
+        document.querySelectorAll('.relative .origin-top-right').forEach(d => {
+            if (d !== dropdown) {
+                d.classList.add('hidden');
+            }
+        });
+
+        dropdown.classList.toggle('hidden');
+
+        const dropdownRect = dropdown.getBoundingClientRect();
+        const tableRect = button.closest('table').getBoundingClientRect(); 
+        const windowBottom = window.innerHeight; 
+
+        const maxBottom = Math.min(tableRect.bottom, windowBottom);
+
+        if (dropdownRect.bottom > maxBottom) {
+            dropdown.style.top = `-${dropdownRect.height}px`; 
+        } else {
+            dropdown.style.top = ''; 
+        }
+    }
     document.addEventListener('click', function (e) {
         const dropdowns = document.querySelectorAll('.relative .origin-top-right');
         dropdowns.forEach(dropdown => {
@@ -136,5 +155,6 @@
             }
         });
     });
+
 </script>
 @endsection
