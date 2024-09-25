@@ -18,24 +18,14 @@
                         <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M9 5l7 7-7 7"></path>
                         </svg>
-                        <span class="ml-1 text-gray-500 md:ml-2">Details</span>
+                        <span class="ml-1 text-gray-500 md:ml-2">Music</span>
                     </div>
                 </li>
             </ol>
         </nav>
-        
-        <div class="border-b border-gray-200 mb-6">
-            <ul class="flex">
-                <li class="mr-2">
-                    <a id="user-details-tab" href="{{ route('artists.show',$artist['user_id']) }}" class="inline-block py-2 px-4 text-gray-600 hover:text-indigo-800 font-semibold" onclick="showTab('user-details')">Details</a>
-                </li>
-                <li class="mr-2">
-                    <a href="{{ route('artists.show-music',$artist['user_id']) }}" id="music-tab" class="inline-block py-2 px-4 text-indigo-600 hover:text-indigo-800 font-semibold" onclick="showTab('music')">Music</a>
-                </li>
-            </ul>
-        </div>
+        <h1 class="text-2xl font-bold text-indigo-600">Artist Music</h1>
 
-        <div id="music" class="tab-content">
+        <div id="music" class="">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="md:col-span-2">
                     <div class="flex justify-between mt-4 mb-4">

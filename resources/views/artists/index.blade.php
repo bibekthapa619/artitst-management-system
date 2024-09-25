@@ -62,33 +62,33 @@
                                 <td class="py-3 px-6 text-left">{{ $artist['name'] }}</td>
                                 <td class="py-3 px-6 text-left">{{ $artist['first_release_year'] }}</td>
                                 <td class="py-3 px-6 text-left">{{ $artist['no_of_albums_released'] }}</td>
-                                
-                                <td class="py-3 px-6 text-center">
+                                <td class="py-3 px-6 text-center relative">
                                     <div class="flex justify-center items-center space-x-4">
-                                        <a href="{{ route('artists.show', $artist['user_id']) }}" class="text-blue-600 hover:text-blue-900" title="View">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1.5 12c2.5 4 6.5 7 10.5 7s8-3 10.5-7c-2.5-4-6.5-7-10.5-7S4 8 1.5 12z"/>
-                                                <circle cx="12" cy="12" r="3" fill="currentColor" />
-                                            </svg>
-                                        </a>
-                                        @hasrole('artist_manager')
-                                        <a href="{{ route('artists.edit', $artist['user_id']) }}" class="text-yellow-600 hover:text-yellow-900" title="Edit">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16.414 3a2 2 0 012.828 0l1.758 1.758a2 2 0 010 2.828l-9.9 9.9a2 2 0 01-.707.414l-3.543 1.414a1 1 0 01-1.272-1.272l1.414-3.543a2 2 0 01.414-.707l9.9-9.9zM14 7l3 3m-6.586 6.586L7 17l.707-.707m-1.414-1.414L7 17" />
-                                            </svg>
-                                        </a>
-                                        <form action="{{ route('artists.destroy', $artist['user_id']) }}" method="POST" onsubmit="return confirmDelete()">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="text-red-600 hover:text-red-900" title="Delete">
+                                        <div class="relative inline-block text-left">
+                                            <button onclick="toggleDropdown(this)" class="text-gray-600 hover:text-gray-900" title="Options">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                                </svg>
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6h.01M12 12h.01M12 18h.01"/>
+                                                  </svg>
                                             </button>
-                                        </form>
-                                        @endhasrole
+                                
+                                            <div class="hidden origin-top-right absolute right-0 mt-2 w-44 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
+                                                <div class="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+                                                    <a href="{{ route('artists.show', $artist['user_id']) }}" class="block px-4 py-2 text-sm text-gray-600 hover:bg-blue-50" role="menuitem">Profile</a>
+                                                    <a href="{{ route('artists.show-music', $artist['user_id']) }}" class="block px-4 py-2 text-sm text-gray-600 hover:bg-blue-50" role="menuitem">Music</a>
+                                                    @hasrole('artist_manager')
+                                                    <a href="{{ route('artists.edit', $artist['user_id']) }}" class="block px-4 py-2 text-sm text-yellow-600 hover:bg-blue-50" role="menuitem">Edit</a>
+                                                    <form action="{{ route('artists.destroy', $artist['user_id']) }}" method="POST" class="block" role="menuitem" onsubmit="return confirmDelete()">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-blue-50">Delete</button>
+                                                    </form>
+                                                    @endhasrole
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </td>
+                                                        
                             </tr>
                         @endforeach
                     </tbody>
@@ -122,5 +122,19 @@
     function confirmDelete() {
         return confirm('Are you sure you want to delete this artist?');
     }
+
+    function toggleDropdown(button) {
+        const dropdown = button.nextElementSibling;
+        dropdown.classList.toggle('hidden');
+    }
+
+    document.addEventListener('click', function (e) {
+        const dropdowns = document.querySelectorAll('.relative .origin-top-right');
+        dropdowns.forEach(dropdown => {
+            if (!dropdown.contains(e.target) && !dropdown.previousElementSibling.contains(e.target)) {
+                dropdown.classList.add('hidden');
+            }
+        });
+    });
 </script>
 @endsection

@@ -23,7 +23,7 @@
             </ol>
         </nav>
 
-        <h1 class="text-2xl font-bold text-indigo-600">Edit User</h1>
+        <h1 class="text-2xl font-bold text-indigo-600">Edit Artist</h1>
 
         <form method="POST" action="{{ route('artists.update', $artist['user_id']) }}" class="mt-6">
             @csrf

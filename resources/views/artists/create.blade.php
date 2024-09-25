@@ -9,7 +9,7 @@
             <ol class="inline-flex items-center space-x-1 md:space-x-3">
                 <li class="inline-flex items-center">
                     <a href="{{ route('artists.index') }}" class="text-indigo-600 hover:text-indigo-800 inline-flex items-center">
-                        Users
+                        Artists
                     </a>
                 </li>
                 <li>
