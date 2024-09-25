@@ -28,41 +28,42 @@
         <form method="POST" action="{{ route('music.store') }}" class="mt-6">
             @csrf
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div id="music-records">
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-6 music-row">
+                    <div class="md:col-span-4">
+                        <label class="block text-sm font-medium text-gray-700">Title</label>
+                        <input type="text" name="music[0][title]" class="w-full p-2 border border-gray-300 rounded-lg @error('title') border-red-500 @enderror" required>
+                        @error('title')
+                            <span class="text-red-500 text-sm">{{ $message }}</span>
+                        @enderror
+                    </div>
 
-                <div class="md:col-span-2">
-                    <h2 class="text-lg font-semibold text-gray-700 mb-2">Music Details</h2>
-                </div>
+                    <div class="md:col-span-4">
+                        <label class="block text-sm font-medium text-gray-700">Album Name</label>
+                        <input type="text" name="music[0][album_name]" class="w-full p-2 border border-gray-300 rounded-lg @error('album_name') border-red-500 @enderror" required>
+                        @error('album_name')
+                            <span class="text-red-500 text-sm">{{ $message }}</span>
+                        @enderror
+                    </div>
 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Title</label>
-                    <input type="text" name="title" value="{{ old('title') }}" class="w-full p-2 border border-gray-300 rounded-lg @error('title') border-red-500 @enderror" required>
-                    @error('title')
-                        <span class="text-red-500 text-sm">{{ $message }}</span>
-                    @enderror
-                </div>
+                    <div class="md:col-span-3">
+                        <label class="block text-sm font-medium text-gray-700">Genre</label>
+                        <select name="music[0][genre]" class="w-full p-2 border border-gray-300 rounded-lg @error('genre') border-red-500 @enderror" required>
+                            <option value="" disabled selected>Select a genre</option>
+                            @foreach($genres as $genre)
+                                <option value="{{ $genre }}">{{ $genre }}</option>
+                            @endforeach
+                        </select>
+                        @error('genre')
+                            <span class="text-red-500 text-sm">{{ $message }}</span>
+                        @enderror
+                    </div>
 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Album Name</label>
-                    <input type="text" name="album_name" value="{{ old('album_name') }}" class="w-full p-2 border border-gray-300 rounded-lg @error('last_name') border-red-500 @enderror" required>
-                    @error('album_name')
-                        <span class="text-red-500 text-sm">{{ $message }}</span>
-                    @enderror
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Genre</label>
-                    <select id="genre" name="genre" class="w-full p-2 border border-gray-300 rounded-lg @error('genre') border-red-500 @enderror" required>
-                        <option value="" disabled {{ old('genre') === null ? 'selected' : '' }}>Select a genre</option>
-                        @foreach($genres as $genre)
-                            <option value="{{ $genre }}" {{ old('genre', $user['genre'] ?? '') == $genre ? 'selected' : '' }}>
-                                {{ $genre }}
-                            </option>
-                        @endforeach
-                    </select>
-                    @error('genre')
-                        <span class="text-red-500 text-sm">{{ $message }}</span>
-                    @enderror
+                    <div class="md:col-span-1 flex items-end">
+                        <button type="button" class="add-row px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600">
+                            +
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -72,5 +73,51 @@
         </form>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        let recordIndex = 1;
+        const musicRecords = document.getElementById('music-records');
+
+        document.addEventListener('click', function(e) {
+            if (e.target && e.target.classList.contains('add-row')) {
+                e.preventDefault();
+                const newRow = document.createElement('div');
+                newRow.classList.add('grid', 'grid-cols-1', 'md:grid-cols-12', 'gap-6', 'music-row', 'mt-4');
+                newRow.innerHTML = `
+                    <div class="md:col-span-4">
+                        <label class="block text-sm font-medium text-gray-700">Title</label>
+                        <input type="text" name="music[${recordIndex}][title]" class="w-full p-2 border border-gray-300 rounded-lg" required>
+                    </div>
+                    <div class="md:col-span-4">
+                        <label class="block text-sm font-medium text-gray-700">Album Name</label>
+                        <input type="text" name="music[${recordIndex}][album_name]" class="w-full p-2 border border-gray-300 rounded-lg" required>
+                    </div>
+                    <div class="md:col-span-3">
+                        <label class="block text-sm font-medium text-gray-700">Genre</label>
+                        <select name="music[${recordIndex}][genre]" class="w-full p-2 border border-gray-300 rounded-lg" required>
+                            <option value="" disabled selected>Select a genre</option>
+                            @foreach($genres as $genre)
+                                <option value="{{ $genre }}">{{ $genre }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="md:col-span-1 flex items-end">
+                        <button type="button" class="remove-row px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
+                            -
+                        </button>
+                    </div>
+                `;
+                musicRecords.appendChild(newRow);
+                recordIndex++;
+            }
+
+            if (e.target && e.target.classList.contains('remove-row')) {
+                e.preventDefault();
+                e.target.closest('.music-row').remove();
+            }
+        });
+    });
+</script>
 
 @endsection

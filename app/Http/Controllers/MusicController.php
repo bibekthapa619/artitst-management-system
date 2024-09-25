@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\MusicRequest;
+use App\Http\Requests\StoreMusicRequest;
+use App\Http\Requests\UpdateMusicRequest;
 use App\Services\ArtistService;
 use App\Services\MusicService;
 use Exception;
@@ -41,19 +42,15 @@ class MusicController extends Controller implements HasMiddleware
         $bindings = [];
 
         if($search){
-            if(in_array($search,$this->genres)){
-                $condition .= " AND genre = ?";
-                $bindings = [$search];
-            }
-            else{
-                $condition .= " AND (title like  ?
-                                OR album_name like ?
-                            )";
-                $bindings = [
-                    "%$search%",
-                    "%$search%",
-                ];
-            }            
+            $condition .= " AND (genre like ?
+                            OR title like  ?
+                            OR album_name like ?
+                        )";
+            $bindings = [
+                "%$search%",
+                "%$search%",
+                "%$search%",
+            ];
         }
      
         $data = $this->musicService->getAllMusic(
@@ -75,18 +72,17 @@ class MusicController extends Controller implements HasMiddleware
         return view('music.create',compact('genres'));
     }
 
-    public function store(MusicRequest $request)
+    public function store(StoreMusicRequest $request)
     {
         try{
-            
-            $data = $request->validated();
-            
+            $data = $request->validated()['music'];
             $artist = $this->artistService->getArtistByUserId(Auth::user()->id);
-            
-            $data['artist_id'] = $artist['id'];
             DB::beginTransaction();
-
-            $this->musicService->createMusic($data);
+            
+            foreach($data as $music){
+                $music['artist_id'] = $artist['id'];
+                $this->musicService->createMusic($music);
+            }
 
             DB::commit();
             return redirect()->route('music.index')->with('success', 'Music created successfully.');
@@ -107,7 +103,7 @@ class MusicController extends Controller implements HasMiddleware
         return view('music.edit', compact('music','genres'));
     }
 
-    public function update(MusicRequest $request, $id)
+    public function update(UpdateMusicRequest $request, $id)
     {
         try{
             $validatedData = $request->validated();
