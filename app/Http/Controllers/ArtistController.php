@@ -17,6 +17,7 @@ use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 
 class ArtistController extends Controller implements HasMiddleware
@@ -91,6 +92,9 @@ class ArtistController extends Controller implements HasMiddleware
         if (!$artist) {
             return redirect()->route('artists.index')->with('error', 'Artist not found.');
         }
+        if (!Gate::allows('can-view-artist', ['artist'=>$artist])) {
+            return redirect()->route('artists.index')->with('error', 'Unauthorized to manage this user.');
+        }
         return view('artists.show', compact('artist'));
     }
 
@@ -99,13 +103,16 @@ class ArtistController extends Controller implements HasMiddleware
         $page = $request->page ?? 1;
         $pageSize = $request->page_size ?? 10;
         $search = $request->search;
-        $artist = $this->artistService->getArtistByUserId($userId);
+        $artist = $this->artistService->getAllDetailsByUserId($userId);
 
         if (!$artist) {
             return redirect()->route('artists.index')->with('error', 'Artist not found.');
         }
+        if (!Gate::allows('can-view-artist', ['artist'=>$artist])) {
+            return redirect()->route('artists.index')->with('error', 'Unauthorized to manage this user.');
+        }
 
-        $condition = "artist_id = {$artist['id']}";
+        $condition = "artist_id = {$artist['artist_id']}";
         $bindings = [];
 
         if($search){
@@ -187,6 +194,10 @@ class ArtistController extends Controller implements HasMiddleware
         if (!$artist) {
             return redirect()->route('artists.index')->with('error', 'Artist not found.');
         }
+
+        if (!Gate::allows('can-edit-artist', ['artist'=>$artist])) {
+            return redirect()->route('artists.index')->with('error', 'Unauthorized to manage this user.');
+        }
     
         return view('artists.edit', compact('artist'));
     }
@@ -231,6 +242,9 @@ class ArtistController extends Controller implements HasMiddleware
         $user = $this->userService->getUserById($id);
         if (!$user) {
             return redirect()->route('artists.index')->with('error', 'Artist not found.');
+        }
+        if (!Gate::allows('can-delete-artist', ['artist'=>$user])) {
+            return redirect()->route('artists.index')->with('error', 'Unauthorized to manage this user.');
         }
 
         $this->userService->deleteUser($id);

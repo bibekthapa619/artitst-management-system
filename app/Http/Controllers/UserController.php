@@ -13,6 +13,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
+
 class UserController extends Controller implements HasMiddleware
 {
     protected $userService;
@@ -35,7 +38,7 @@ class UserController extends Controller implements HasMiddleware
         $page = $request->page ?? 1;
         $pageSize = $request->page_size ?? 10;
         $search = $request->search;
-        $userId = auth()->user()->id;
+        $userId = Auth::user()->id;
         $condition = "super_admin_id ='$userId' and role != 'super_admin'";
         $bindings = [];
 
@@ -76,6 +79,10 @@ class UserController extends Controller implements HasMiddleware
         if (!$user) {
             return redirect()->route('users.index')->with('error', 'User not found.');
         }
+        if (!Gate::allows('can-manage-user', ['user'=>$user])) {
+            return redirect()->route('users.index')->with('error', 'Unauthorized to manage this user.');
+        }
+        
         if($user['role'] === 'artist'){
             $user = $this->artistService->getAllDetailsByUserId($id);
         }
@@ -95,7 +102,7 @@ class UserController extends Controller implements HasMiddleware
             $userData = $request->validated();
             
             $userData['password'] = Hash::make($userData['password']);
-            $userData['super_admin_id'] = auth()->user()->id;
+            $userData['super_admin_id'] = Auth::user()->id;
             
             DB::beginTransaction();
 
@@ -131,6 +138,10 @@ class UserController extends Controller implements HasMiddleware
         if (!$user) {
             return redirect()->route('users.index')->with('error', 'User not found.');
         }
+        if (!Gate::allows('can-manage-user', ['user'=>$user])) {
+            return redirect()->route('users.index')->with('error', 'Unauthorized to manage this user.');
+        }
+
         if($user['role'] === 'artist'){
             $user = $this->artistService->getAllDetailsByUserId($id);
         }
@@ -177,6 +188,9 @@ class UserController extends Controller implements HasMiddleware
         $user = $this->userService->getUserById($id);
         if (!$user) {
             return redirect()->route('users.index')->with('error', 'User not found.');
+        }
+        if (!Gate::allows('can-manage-user', ['user'=>$user])) {
+            return redirect()->route('users.index')->with('error', 'Unauthorized to manage this user.');
         }
 
         $this->userService->deleteUser($id);
